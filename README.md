@@ -1,0 +1,1 @@
+Textual UI terminal application for Bronkhorst mass flow controllers and various sensors. Tinkerforge and NI DAQ instruments to be implemented. Developed for my master thesis project of a hydrogen/air piloted jet burner.
