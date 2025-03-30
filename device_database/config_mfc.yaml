@@ -1,0 +1,126 @@
+configuration_info:
+  owner       : "Baris Ucarsoy"
+  name        : "LPHC Atmospheric Setup"
+  description : "Lean Premixed Hydrogen Combustion Setup"
+  date        : "2025-04-01"
+
+connection:
+  port    : "/dev/cu.usbserial-2110"  # Serial port for the device connection
+  baudrate: 38400                     # Baudrate for the serial connection
+
+setup: # Enter valid values for the gases
+  fuels       : ["h2", "ch4"]
+  oxidizers   : ["air"]
+  inert_gases : ["n2"]
+
+mfc_bundles: ["coflow", "pilot_air", "pilot_h2" , "jet_air", "jet_h2", "methane"]
+
+# M23208425A:
+  #  serial:            "M23208425A"  -> Serial number of the device
+  #  tag:               "coflow"      -> User defined nametag for the device
+  #  user_fluid:        "n2"          -> Fluid that the used in the application
+  #  factory_fluid:     "air"         -> Fluid that the device is factory calibrated with
+  #  conv_poly:         [0, 1, 0, 0]  -> Conversion polynomial coefficients a+b*x^2+cx^3
+  #  calib_poly:        [0, 1, 0, 0]  -> Calibration polynomial coefficients a+b*x^2+cx^3
+  #  factory_unit:      "m3n/h"       -> Unit of the factory calibration
+  #  factory_capacity:  100.0         -> Factory capacity of the device
+  #  m3n_h_capacity:    100.0         -> Capacity of the device in m3n/h
+  #  last_calibration:  "2025-04-01"  -> Date of the last calibration
+
+devices:
+  M23208425A:
+    serial           : "M23208425A"
+    tag              : "coflow"
+    user_fluid       : "n2"
+    factory_fluid    : "air"
+    conv_poly        : [0, 1.0, 0, 0]
+    calib_poly       : [7.48953051e-03, 9.84524689e-01, 8.32797401e-04, -1.57371631e-05]
+    factory_unit     : "m3n/h"
+    factory_capacity : 100.0
+    m3n_h_capacity   : 100.0
+    last_calibration : "2025-04-01"
+
+  99204414A:
+    serial           : "99204414A"
+    tag              : "pilot_air"
+    user_fluid       : "air"
+    factory_fluid    : "air"
+    conv_poly        : [0.0, 1.0, 0.0, 0.0]
+    calib_poly       : [7.92382121e-02, 9.84756670e-01, -1.61885050e-04, 2.72901932e-06]
+    factory_unit     : "ln/h"
+    factory_capacity : 9000.0
+    m3n_h_capacity   : 9.0
+    last_calibration : "2025-04-01"
+
+  M12203796A:
+    serial           : "M12203796A"
+    tag              : "pilot_h2"
+    user_fluid       : "h2"
+    factory_fluid    : "air"
+    conv_poly        : [0.0, 1.0, 0.0, 0.0]
+    calib_poly       : [ 1.26809727e-01, 9.50558146e-01, 1.06600719e-03, -7.79432691e-06 ]
+    factory_unit     : "ln/h"
+    factory_capacity : 1000.0
+    m3n_h_capacity   : 1.0
+    last_calibration : "2025-04-01"
+
+  M11212468A:
+    serial           : "M11212468A"
+    tag              : "jet_air"
+    user_fluid       : "air"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ -1.22666794e-01, 9.89281872e-01, -1.38853305e-04, 1.42273961e-06 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 2.8
+    m3n_h_capacity   : 2.8
+    last_calibration : "2025-04-01"
+
+  M12213555A:
+    serial           : "M12213555A"
+    tag              : "jet_h2"
+    user_fluid       : "h2"
+    factory_fluid    : "air"
+    conv_poly        : [0.0, 1.0, 0.0, 0.0]
+    calib_poly       : [ -5.72846418e-03, 9.76581853e-01, 5.10523395e-04, -3.56041295e-06 ]
+    factory_unit     : "ln/h"
+    factory_capacity : 240.0
+    m3n_h_capacity   : 0.240
+    last_calibration : "2025-04-01"
+
+  M11205427A:
+    serial           : "M11205427A"
+    tag              : "methane"
+    user_fluid       : "ch4"
+    factory_fluid    : "o2"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ -2.40127934e-01, 9.77225823e-01, -4.31259937e-03, 5.33965270e-05 ]
+    factory_unit     : "mln/min"
+    factory_capacity : 1400.0
+    m3n_h_capacity   : 0.084
+    last_calibration : "2025-04-01"
+
+  M00000000A:
+    serial           : "M00000000A"
+    tag              : "jet_h2"
+    user_fluid       : "h2"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 2.4
+    m3n_h_capacity   : 2.4
+    last_calibration : "1970-01-01"
+
+
+  M00000000B:
+    serial           : "M00000000B"
+    tag              : "jet_air"
+    user_fluid       : "air"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 10
+    m3n_h_capacity   : 10
+    last_calibration : "1970-01-01"
