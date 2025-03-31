@@ -1,5 +1,3 @@
-import logging
-
 import propar
 import sys
 import time
@@ -315,13 +313,20 @@ class DeviceManager:
         # TODO: Connect tinkerforge relay to purge the device with N2
         warnings.warn("Purge function is not implemented yet. Connect tinkerforge relay to purge the device with N2")
 
-    def write_setpoint_bundle(self, bundle: str, input_setpoint: float, cutoff_percent: float = 10, bypass: bool = False):
-        """ Write setpoint to the bundle of devices. Logic is similar to write_setpoint_manual.
-            Input setpoint is checked against the bundle max capacities and sent to the appropriate device.
-            Input must be flow rate in m3n/h.
+    def write_setpoint_bundle(self, bundle: str, input_setpoint: float, cutoff_percent: float = 0.1,
+                              bypass: bool = False):
         """
+        Write setpoint to the bundle of devices.
+        When multiple devices can handle the setpoint, select the one where the setpoint
+        is in the higher percentage of its capacity range for better control.
 
-        selected_device = None
+        Args:
+            bundle: Name of the device bundle
+            input_setpoint: Flow rate in m3n/h
+            cutoff_percent: Lower cutoff percentage of device capacity (default 0.1)
+            bypass: Whether to bypass calibration (default False)
+        """
+        self.selected_device = None
 
         # Check if the bundle is valid
         if bundle not in self.bundles:
@@ -330,18 +335,28 @@ class DeviceManager:
         # Get the devices in the bundle
         devices = self.bundles[bundle]
 
-        # Check which mfc to choose for the given flow rate
+        # Find all suitable devices and their capacity percentages
+        suitable_devices = []
+
         for device_serial in devices:
             max_capacity = self.device_db[device_serial].m3n_h_capacity
             lower_cutoff = cutoff_percent * max_capacity
 
             if lower_cutoff <= input_setpoint <= max_capacity:
-                # If the input setpoint is within the range of the device, set the setpoint
-                selected_device = device_serial
+                # Calculate what percentage of the device's capacity this setpoint represents
+                percentage_of_capacity = (input_setpoint / max_capacity) * 100
+                suitable_devices.append((device_serial, percentage_of_capacity))
 
-        if selected_device is not None:
-            self.write_setpoint_manual(selected_device, input_setpoint, is_percentage=False, bypass=bypass)
+        # Sort by percentage of capacity (highest first)
+        suitable_devices.sort(key=lambda x: x[1], reverse=True)
+
+        if suitable_devices:
+            # Select the device with highest percentage of capacity
+            self.selected_device = suitable_devices[0][0]
+            self.write_setpoint_manual(self.selected_device, input_setpoint, is_percentage=False, bypass=bypass)
+            return True
         else:
+            print(f"Input setpoint {input_setpoint} is out of range for the bundle {bundle}.")
             return False
 
 
@@ -357,12 +372,8 @@ if __name__ == "__main__":
     print(dm.device_db['M23208425A'].conv_poly)
     print(f"Calibrated value: {calibrated}")
 
-    bundles = dm.bundles
-
-    for bundle in bundles:
-        print(f"Bundle: {bundle}")
-        for device in bundles[bundle]:
-            print(f"Device: {device}")
+    dm.write_setpoint_bundle('jet_h2', 0.24, bypass=True)
+    print(dm.selected_device)
 
     # # Connect to the device
     # dm.init_sequence()

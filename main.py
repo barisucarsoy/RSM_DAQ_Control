@@ -1,17 +1,19 @@
 from ui.main_app import RSM_DAQ_Toolbox
 from device_managers.device_manager_bronkhorst import DeviceManager
-
+import time
 
 if __name__ == "__main__":
 
+    # Initialize the device manager
     device_manager = DeviceManager.get_instance()
+
     app = RSM_DAQ_Toolbox()
     app.run()
-    print("App closed")
 
     try:
         device_manager.abort_all()
         print("All devices aborted")
+
         device_manager.stop()
         print("Device manager stopped")
 

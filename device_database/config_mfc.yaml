@@ -108,8 +108,8 @@ devices:
     conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
     calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
     factory_unit     : "m3n/h"
-    factory_capacity : 2.4
-    m3n_h_capacity   : 2.4
+    factory_capacity : 1.2
+    m3n_h_capacity   : 1.2
     last_calibration : "1970-01-01"
 
 
