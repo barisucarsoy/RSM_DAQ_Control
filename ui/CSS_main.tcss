@@ -1,0 +1,212 @@
+Screen {
+    # layout: grid;
+}
+
+#tabbed_content {
+    border: solid $accent blank;
+    height: 80%;
+}
+
+#bottom_container {
+    layout: grid;
+    grid-size: 6 1;
+    height: 20%;
+}
+
+#bottom_menu {
+    column-span: 1;
+    border: solid $accent round;
+}
+
+FlowCalculator {
+    border: solid lightblue round;
+    height: auto;
+    column-span: 3;
+    }
+
+#connection_logs {
+    margin-left: 1;
+    column-span: 2;
+    border: solid $accent round;
+    # background: $background;
+}
+
+
+#port_select{
+    width: 15;
+}
+
+
+# -------------------------------
+MFCModule {
+    layout: horizontal;
+    align: left top;
+    height: auto;
+    align: left top;
+}
+
+.mfc-container {
+    border: $accent round;
+    border-title-align: left;
+    width: 100%;
+    border-title-color: grey;
+    # border-title-background: $background;
+}
+
+.mfc_arm_switch {
+    background: #96304a;
+}
+
+.progress_label_container {
+    align: left middle;
+    width: auto;
+}
+
+.progress_labels {
+    width: auto;
+    align: left middle;
+    }
+
+.progress_bars {
+    align: left middle;
+    width: auto;
+    }
+
+.mfc_progress_bar {
+    width: auto;
+    align: left middle;
+    }
+
+#flow_label {
+    height: 3;
+    width: 15;
+    border: darkgrey panel;
+    border-title-align: center;
+    content-align: center middle;
+}
+
+.mfc_input {
+    height: 3;
+    width: 15;
+    background: darkslategrey;
+}
+
+#send_button {
+    width: 10;
+}
+
+.disabled-input {
+    opacity: 0.7;
+}
+
+.disabled-button {
+    opacity: 0.7;
+}
+
+.switch_armed{
+    background: #4a9630;
+}
+
+.temperature_label {
+    height: 3;
+    width: 10;
+    border: red panel;
+}
+
+#wink_button {
+    margin-left: 1;
+    height: 3;
+    width: 3;
+}
+# -------------------------------
+BronkhorstWidget {
+    # column-span: 10;
+    # row-span: 5;
+}
+
+#MFC_BOX {
+    layout: grid;
+    grid-size: 2 9;
+    width: 100%;
+    grid-gutter: 0 0;
+    
+}
+
+#title {
+    height: auto;
+    border: solid $accent round;
+    align: center middle;
+}
+
+#dash_container {
+    layout: horizontal;
+    align: left middle;
+    height: 3;
+    margin: 1;
+}
+
+.comm_button {
+    align: left middle;
+    margin-left: 1;
+    margin-right: 1;
+}
+
+# #connection_logs {
+#     height: 4;
+#     width: 75;
+#     margin: 0;
+# }
+
+#connection_status {
+    height: 3;
+    width: 25;
+    margin: 1;
+}
+
+#---------------------
+
+#diameter, #temperature, #pressure, #jet_flow_speed, #jet_eq_ratio, #jet_dia,
+#pilot_flow_speed, #pilot_eq_ratio, #pilot_dia {
+    width: 15;
+    height: 3;
+    border: solid $accent round;
+    border-title-align: left;
+    background: $background;
+}
+
+#jet_flowrate_label_h2, #jet_flowrate_label_air, #jet_mass_flowrate_label,
+#pilot_flowrate_label_h2, #pilot_flowrate_label_air, #pilot_mass_flowrate_label {
+    width: 20;
+    height: 3;
+    border: solid lightblue round;
+    border-title-align: left;
+}
+
+    #jet_inputs, #pilot_inputs, #jet_outputs, #pilot_outputs {
+        height: auto; /* Let inner containers size naturally */
+        width: auto;
+    }
+
+    .error_message {
+        color: red;
+        height: 1;
+    }
+
+    #send_container {
+        height: auto;
+        margin: 1;
+    }
+
+    #send_button {
+        width: 10;
+    }
+
+    .calculate_button {
+        margin: 0;
+    }
+
+
+    #main_horizontal_layout {
+         align: center top;
+         height: 80%;
+    }

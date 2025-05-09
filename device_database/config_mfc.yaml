@@ -17,7 +17,7 @@ mfc_bundles: ["coflow", "pilot_air", "pilot_h2" , "jet_air", "jet_h2", "methane"
 
 # M23208425A:
   #  serial:            "M23208425A"  -> Serial number of the device
-  #  tag:               "coflow"      -> User defined nametag for the device
+  #  tag:               "coflow"      -> User defined nametag for the device for bundling
   #  user_fluid:        "n2"          -> Fluid that the used in the application
   #  factory_fluid:     "air"         -> Fluid that the device is factory calibrated with
   #  conv_poly:         [0, 1, 0, 0]  -> Conversion polynomial coefficients a+b*x^2+cx^3
@@ -25,7 +25,7 @@ mfc_bundles: ["coflow", "pilot_air", "pilot_h2" , "jet_air", "jet_h2", "methane"
   #  factory_unit:      "m3n/h"       -> Unit of the factory calibration
   #  factory_capacity:  100.0         -> Factory capacity of the device
   #  m3n_h_capacity:    100.0         -> Capacity of the device in m3n/h
-  #  last_calibration:  "2025-04-01"  -> Date of the last calibration
+  #  last_calibration: "2025-04-01"   -> Date of the last calibration
 
 devices:
   M23208425A:
@@ -124,3 +124,75 @@ devices:
     factory_capacity : 10
     m3n_h_capacity   : 10
     last_calibration : "1970-01-01"
+
+  M00000000C:
+    serial           : "M00000000C"
+    tag              : "jet_h2"
+    user_fluid       : "h2"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 1.2
+    m3n_h_capacity   : 1.2
+    last_calibration : "1970-01-01"
+
+  M00000000D:
+    serial           : "M00000000D"
+    tag              : "jet_air"
+    user_fluid       : "air"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 1.2
+    m3n_h_capacity   : 1.2
+    last_calibration : "1970-01-01"
+
+  M00000000E:
+    serial           : "M00000000E"
+    tag              : "pilot_h2"
+    user_fluid       : "h2"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 1.2
+    m3n_h_capacity   : 1.2
+    last_calibration : "1970-01-01"
+
+  M00000000F:
+    serial           : "M00000000F"
+    tag              : "pilot_air"
+    user_fluid       : "air"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 1.2
+    m3n_h_capacity   : 1.2
+    last_calibration : "1970-01-01"
+
+  M00000000G:
+    serial           : "M00000000G"
+    tag              : "co-flow"
+    user_fluid       : "n2"
+    factory_fluid    : "air"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit     : "m3n/h"
+    factory_capacity : 1.2
+    m3n_h_capacity   : 1.2
+    last_calibration : "1970-01-01"
+
+  M00000000I:
+    serial: "M00000000I"
+    tag: "co-flow"
+    user_fluid: "n2"
+    factory_fluid: "air"
+    conv_poly: [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly: [ 0.0, 1.0, 0.0, 0.0 ]
+    factory_unit: "m3n/h"
+    factory_capacity: 1.2
+    m3n_h_capacity: 1.2
+    last_calibration: "1970-01-01"

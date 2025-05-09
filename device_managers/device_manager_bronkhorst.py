@@ -8,18 +8,17 @@ import warnings
 class DeviceManager:
     """
     Manager class for the Bronkhorst devices. Only one instance of this class should be created.
-    This class is a singleton and should be accessed via the get_instance() method in "main.py" file.
+    This class is a singleton and should be accessed via the get_instance() method in the "main.py" file.
     """
-
     _instance = None
 
     def __init__(self):
-        self.config_loader      = device_database.config_loader_bronkhorst.load_config()  # Load the config data
-        self.device_db          = self.config_loader.devices        # Pull device data from database_bronkhorst file
-        self.connection_config  = self.config_loader.connection     # Pull connection config from database_bronkhorst file
-        self.bundles            = self.config_loader.mfc_bundles.bundles    # Pull bundle data from database_bronkhorst file
-        self.setup              = self.config_loader.setup          # Pull setup data from database_bronkhorst file
-        self.config_info        = self.config_loader.configuration_info # Pull config info from database_bronkhorst file
+        self.config_loader      = device_database.config_loader_bronkhorst.load_config()    # Load the config data
+        self.device_db          = self.config_loader.devices                                # Pull device data from the config file
+        self.connection_config  = self.config_loader.connection                             # Pull connection config from the config file
+        self.bundles            = self.config_loader.mfc_bundles.bundles                    # Pull bundle data from the config file
+        self.setup              = self.config_loader.setup                                  # Pull setup data from the config file
+        self.config_info        = self.config_loader.configuration_info                     # Pull config info from the config file
 
         self.is_connected       = False  # Connection status of the device
 
@@ -48,7 +47,7 @@ class DeviceManager:
         return cls._instance
 
     def set_active_port(self):
-        """This method takes the connection port from config file and checks the operating system."""
+        """This method takes the connection port from the config file and checks the operating system."""
 
         self.active_port = self.connection_config.port
 
@@ -109,10 +108,10 @@ class DeviceManager:
         - missing_devices: Contains devices found but not in the database
 
         Returns:
-            bool: True if comparison completed successfully, False otherwise
+            bool: True if comparison is completed successfully, False otherwise
         """
         try:
-            # Reset dictionaries to ensure clean state
+            # Reset dictionaries to ensure a clean state
             self.matched_devices = {}
             self.missing_devices = {}
             self.new_devices = {}
@@ -212,10 +211,10 @@ class DeviceManager:
         calibration_coef = np.array(self.device_db[device_serial].calib_poly)[::-1] # Calibration polynomial coeffs from database
         convertion_coef  = np.array(self.device_db[device_serial].conv_poly)[::-1]  # Conversion polynomial coeffs from database
 
-        raw_input_calibrated = np.polyval(calibration_coef, raw_percentage)      # Convert the input percentage to calibrated value
-        raw_input_converted = np.polyval(convertion_coef, raw_input_calibrated)  # Convert the calibrated value to converted value
+        raw_input_calibrated = np.polyval(calibration_coef, raw_percentage)       # Convert the input percentage to the calibrated value
+        raw_input_converted  = np.polyval(convertion_coef, raw_input_calibrated)  # Convert the calibrated value to the converted value
 
-        # Check if the input percentage is 0 or 100, and set the converted value accordingly
+        # Check if the input percentage is 0 or 100 and set the converted value accordingly
         if raw_percentage == 0:
             converted_value = 0
         elif raw_percentage == 100:
@@ -250,9 +249,9 @@ class DeviceManager:
                 # Store values directly in the new dictionary
                 new_data_package[matched_device] = {
                         "measure"     : (package[0]["data"]/32000) * max_cap,    # Convert to flow rate m3n/h
-                        "setpoint"    :  package[1]["data"]/32000,               # Convert to fraction
+                        "setpoint"    :  package[1]["data"]/32000,               # Convert to a fraction
                         "temperature" :  round(package[2]["data"], 2),           # Round to 2 decimal places
-                        "valve_output":  package[3]["data"]/16777215,            # Convert to fraction
+                        "valve_output":  package[3]["data"]/16777215,            # Convert to a fraction
                         "ping"        :  response_time,                          # Response time
                 }
 
@@ -290,8 +289,8 @@ class DeviceManager:
         """Set all devices to 0 and stop the device"""
         try:
             for aborted_device in self.matched_devices:
-                self.propar_device.address = self.matched_devices[aborted_device]
-                self.propar_device.writeParameter(9, 0)
+                self.write_setpoint_manual(aborted_device, 0)
+            self.stop()
         except Exception as e:
             print(f"Error aborting device: {e}")
 
@@ -315,8 +314,10 @@ class DeviceManager:
 
     def write_setpoint_bundle(self, bundle: str, input_setpoint: float, cutoff_percent: float = 0.1,
                               bypass: bool = False):
+        
+        #TODO: Check the function
         """
-        Write setpoint to the bundle of devices.
+        Write a setpoint to the bundle of devices.
         When multiple devices can handle the setpoint, select the one where the setpoint
         is in the higher percentage of its capacity range for better control.
 

@@ -40,7 +40,7 @@ class Bar(Widget, can_focus=False):
 
     DEFAULT_CSS = """
     Bar {
-        width: 20;
+        width: 30;
         height: 1;
 
         &> .bar--bar {
@@ -110,7 +110,6 @@ class Bar(Widget, can_focus=False):
                 background_style=Style.from_color(bar_style.bgcolor),
                 gradient=self.gradient,
             )
-
     def render_indeterminate(self) -> RenderResult:
         """Render a frame of the indeterminate progress bar animation."""
         width = self.size.width
@@ -145,7 +144,7 @@ class PercentageStatus(Label):
 
     DEFAULT_CSS = """
     PercentageStatus {
-        min-width: 10;
+        min-width: 7;
         content-align-horizontal: left;
     }
     """
