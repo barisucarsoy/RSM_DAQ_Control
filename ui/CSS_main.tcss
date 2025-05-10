@@ -9,35 +9,29 @@ Screen {
 
 #bottom_container {
     layout: grid;
-    grid-size: 6 1;
+    grid-size: 12 1;
     height: 20%;
 }
 
 #bottom_menu {
-    column-span: 1;
+    column-span: 3;
     border: solid $accent round;
 }
 
 FlowCalculator {
     border: solid lightblue round;
-    height: auto;
-    column-span: 3;
-    }
+    column-span: 5;
+}
 
 #connection_logs {
     margin-left: 1;
-    column-span: 2;
+    column-span: 4;
     border: solid $accent round;
-    # background: $background;
 }
 
 
-#port_select{
-    width: 15;
-}
 
-
-# -------------------------------
+# MFC Boxes
 MFCModule {
     layout: horizontal;
     align: left top;
@@ -48,8 +42,9 @@ MFCModule {
 .mfc-container {
     border: $accent round;
     border-title-align: left;
-    width: 100%;
+    width: 126;
     border-title-color: grey;
+    height: 5;
     # border-title-background: $background;
 }
 
@@ -118,7 +113,8 @@ MFCModule {
     height: 3;
     width: 3;
 }
-# -------------------------------
+
+# MFC Dashboard
 BronkhorstWidget {
     # column-span: 10;
     # row-span: 5;
@@ -132,81 +128,44 @@ BronkhorstWidget {
     
 }
 
-#title {
-    height: auto;
-    border: solid $accent round;
-    align: center middle;
+
+# FlowCalculator
+
+#fixed_inputs_container {
+    # background: green;
+    width: 50;
 }
 
-#dash_container {
-    layout: horizontal;
-    align: left middle;
+#main_horizontal_layout {
+    # background: blue;
+    width: 50;
+}
+
+#diameter, #temperature, #pressure, #jet_dia, #pilot_dia{
+    width: 24;
     height: 3;
-    margin: 1;
-}
-
-.comm_button {
-    align: left middle;
-    margin-left: 1;
-    margin-right: 1;
-}
-
-# #connection_logs {
-#     height: 4;
-#     width: 75;
-#     margin: 0;
-# }
-
-#connection_status {
-    height: 3;
-    width: 25;
-    margin: 1;
-}
-
-#---------------------
-
-#diameter, #temperature, #pressure, #jet_flow_speed, #jet_eq_ratio, #jet_dia,
-#pilot_flow_speed, #pilot_eq_ratio, #pilot_dia {
-    width: 15;
-    height: 3;
-    border: solid $accent round;
+    border: $accent round;
     border-title-align: left;
     background: $background;
 }
 
-#jet_flowrate_label_h2, #jet_flowrate_label_air, #jet_mass_flowrate_label,
-#pilot_flowrate_label_h2, #pilot_flowrate_label_air, #pilot_mass_flowrate_label {
-    width: 20;
+#jet_flow_speed, #jet_eq_ratio, #pilot_flow_speed, #pilot_eq_ratio {
+    width: 24;
     height: 3;
-    border: solid lightblue round;
+    border: $accent round;
     border-title-align: left;
+    background: $background;
 }
 
-    #jet_inputs, #pilot_inputs, #jet_outputs, #pilot_outputs {
-        height: auto; /* Let inner containers size naturally */
-        width: auto;
-    }
+#jet_flowrate_label_h2, #jet_flowrate_label_air, #pilot_flowrate_label_h2, #pilot_flowrate_label_air {
+    width: 24;
+    height: 3;
+    border: lightblue round;
+    border-title-align: left;
+    background: $background;
+    content-align: center middle;
+}
 
-    .error_message {
-        color: red;
-        height: 1;
-    }
-
-    #send_container {
-        height: auto;
-        margin: 1;
-    }
-
-    #send_button {
-        width: 10;
-    }
-
-    .calculate_button {
-        margin: 0;
-    }
-
-
-    #main_horizontal_layout {
-         align: center top;
-         height: 80%;
-    }
+#calculate_button, #send_2_mfc {
+    width: 24;
+}

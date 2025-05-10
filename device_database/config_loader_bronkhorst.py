@@ -15,24 +15,22 @@ class ConfigurationInfo:
     description: str
     date: str
 
-
 @dataclass
 class ConnectionConfig:
     port: str
     baudrate: int
-
 
 @dataclass
 class SetupConfig:
     fuels: List[str]
     oxidizers: List[str]
     inert_gases: List[str]
-
+    misc: List[str]
 
 @dataclass
 class DeviceConfig:
     serial: str
-    tag: str
+    bundle: str
     user_fluid: str
     factory_fluid: str
     conv_poly: List[float]
@@ -42,11 +40,9 @@ class DeviceConfig:
     m3n_h_capacity: float
     last_calibration: str
 
-
 @dataclass
 class MFCBundles:
     bundles: dict[Any, List[str]]
-
 
 @dataclass
 class BronkhorstConfig:
@@ -89,13 +85,14 @@ def load_config(config_path: str = "config_mfc.yaml") -> BronkhorstConfig:
 
     # Load setup config
     setup_config = SetupConfig(
-            fuels=config_data['setup']['fuels'],
-            oxidizers=config_data['setup']['oxidizers'],
-            inert_gases=config_data['setup']['inert_gases']
+            fuels=config_data['setup']['fuel'],
+            oxidizers=config_data['setup']['oxidizer'],
+            inert_gases=config_data['setup']['inert_gases'],
+            misc=config_data['setup']['misc']
     )
 
     # Combine all valid fluids from setup
-    valid_fluids = setup_config.fuels + setup_config.oxidizers + setup_config.inert_gases
+    valid_fluids = setup_config.fuels + setup_config.oxidizers + setup_config.inert_gases + setup_config.misc
 
     # Convert MFC bundle list to a dictionary where bundle names are keys and values are empty lists
     # This will be populated with device serials later
@@ -113,8 +110,8 @@ def load_config(config_path: str = "config_mfc.yaml") -> BronkhorstConfig:
         # Create the device config
         devices[serial] = DeviceConfig(
                 serial=device_data['serial'],
-                tag=device_data['tag'],
-                user_fluid=user_fluid,
+                bundle=device_data['bundle'],
+                user_fluid=device_data['user_fluid'],
                 factory_fluid=device_data['factory_fluid'],
                 conv_poly=device_data['conv_poly'],
                 calib_poly=device_data['calib_poly'],
@@ -125,7 +122,7 @@ def load_config(config_path: str = "config_mfc.yaml") -> BronkhorstConfig:
         )
 
         # Assign device to the appropriate bundle based on tag
-        device_tag = device_data['tag']
+        device_tag = device_data['bundle']
         for bundle_name in mfc_bundles_dict:
             if bundle_name in device_tag:
                 mfc_bundles_dict[bundle_name].append(serial)
@@ -176,7 +173,7 @@ def display_config_summary(config: BronkhorstConfig):
         # Create a table for all bundles
         table = Table(title=f"{bundle_name} Bundle", border_style="cyan")
         table.add_column("Serial", style="cyan")
-        table.add_column("Tag", style="blue")
+        table.add_column("Bundle", style="blue")
         table.add_column("Fluid", style="white")
         table.add_column("Capacity", style="white")
         table.add_column("10% Flow", style="green")
@@ -200,7 +197,7 @@ def display_config_summary(config: BronkhorstConfig):
 
                 table.add_row(
                         serial_display,
-                        device.tag,
+                        device.bundle,
                         f"[{fluid_color}]{device.user_fluid}[/{fluid_color}]",
                         f"{device.m3n_h_capacity:.3f} m³n/h",
                         f"{flow_10:.5f} m³n/h",
@@ -250,7 +247,7 @@ def display_config_summary(config: BronkhorstConfig):
         # Add row to table with calculated values
         devices_table.add_row(
                 serial_display,
-                device.tag,
+                device.bundle,
                 f"[{fluid_color}]{device.user_fluid}[/{fluid_color}]",
                 f"{device.m3n_h_capacity:.3f} m³n/h",
                 f"50.00% ({raw_flow_50:.5f} m³n/h)",
@@ -340,7 +337,7 @@ def plot_calibration_curves(config: BronkhorstConfig, show_plot=True, save_path=
     # Group devices by tag type for better organization
     tag_groups = {}
     for serial, device in config.devices.items():
-        tag_base = device.tag.split('_')[0] if '_' in device.tag else device.tag
+        tag_base = device.bundle.split('_')[0] if '_' in device.bundle else device.bundle
         if tag_base not in tag_groups:
             tag_groups[tag_base] = []
         tag_groups[tag_base].append((serial, device))
@@ -366,7 +363,7 @@ def plot_calibration_curves(config: BronkhorstConfig, show_plot=True, save_path=
             # Determine line style based on tag
             dash_type = "solid"
             for tag_base, pattern in dash_patterns.items():
-                if tag_base in device.tag:
+                if tag_base in device.bundle:
                     dash_type = pattern
                     break
 
@@ -376,10 +373,10 @@ def plot_calibration_curves(config: BronkhorstConfig, show_plot=True, save_path=
                     x=x,
                     y=y,
                     mode='lines',
-                    name=f"{device.tag} ({device.serial})",
+                    name=f"{device.bundle} ({device.serial})",
                     hovertemplate=(
                         f"Device: {device.serial}<br>"
-                        f"Tag: {device.tag}<br>"
+                        f"Bundle: {device.bundle}<br>"
                         f"Input: %{{x:.2f}}%<br>"  # Note the double braces
                         f"Output: %{{y:.5f}}<br>"  # Note the double braces
                         f"Fluid: {device.user_fluid}<br>"

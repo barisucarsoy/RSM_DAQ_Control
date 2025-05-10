@@ -34,7 +34,7 @@ class MFCModule(Widget):
 		self.mfc_data = self.device_db[
 			mfc_serial
 		]  # Get MFC data from the database according to serial number
-		self.mfc_tag = self.mfc_data.tag  # Tag of the MFC
+		self.mfc_bundle = self.mfc_data.bundle  # Tag of the MFC
 		self.mfc_fluid = self.mfc_data.user_fluid  # Target fluid of the MFC
 		self.mfc_unit = "m3n/h"  # Unit of the MFC
 		self.mfc_capacity = self.mfc_data.m3n_h_capacity  # Max capacity of the MFC
@@ -50,7 +50,7 @@ class MFCModule(Widget):
 		container.border_title = (
 				self.mfc_serial
 				+ " - "
-				+ self.mfc_tag
+				+ self.mfc_bundle
 				+ " - "
 				+ self.mfc_fluid
 				+ " - "

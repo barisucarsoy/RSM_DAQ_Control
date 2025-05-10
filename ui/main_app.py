@@ -19,9 +19,7 @@ class RSM_DAQ_Toolbox(App):
 	
 	BINDINGS = [
 			("ctrl+q", "quit", "Quit"),
-			
 	]
-	
 	
 	def compose(self) -> ComposeResult:
 		
