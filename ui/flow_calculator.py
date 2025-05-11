@@ -340,6 +340,8 @@ class FlowCalculator(Widget):
         self.log_message(f"  Jet H2 = {jet_h2_mfc},   Jet Air = {jet_air_mfc}")
         self.log_message(f"Pilot H2 = {pilot_h2_mfc}, Pilot Air = {pilot_air_mfc}")
         
+        theme_background_color, color = self.app.background_colors
+        
         mfc_modules = list(self.app.query(MFCModule))
         try:
             for module in mfc_modules:
@@ -367,9 +369,13 @@ class FlowCalculator(Widget):
                         input_field.value = f"{self.calculated_flowrates["Air_Pilot"]:.5f}"
                         module.styles.background = "blue 20%"
                         module.styles.opacity = "100%"
-                    
+                        
                     else:
-                        module.styles.opacity = "30%"
-                        module.styles.background = "black"
+                        if module.mfc_serial in self.bundles["coflow"]:
+                            module.styles.background = color
+                            module.styles.opacity = "100%"
+                        else:
+                            module.styles.background = color
+                            module.styles.opacity = "30%"
         except Exception as e:
             self.log_message(f"Error setting flow rates: {e}")

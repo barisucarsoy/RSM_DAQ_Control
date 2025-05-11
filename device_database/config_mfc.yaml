@@ -88,16 +88,29 @@ devices:
     m3n_h_capacity   : 0.240
     last_calibration : "2025-04-01"
 
+
+  M11205427A:
+    serial           : "M11205427A"
+    bundle           : "ch4"
+    user_fluid       : "ch4"
+    factory_fluid    : "o2"
+    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly       : [ -2.40127934e-01, 9.77225823e-01, -4.31259937e-03, 5.33965270e-05 ]
+    factory_unit     : "mln/min"
+    factory_capacity : 1400.0
+    m3n_h_capacity   : 0.084
+    last_calibration : "2025-04-01"
+
   M000000000A:
-    serial          : "M000000000A"
-    bundle          : "jet_h2"
-    user_fluid      : "h2"
-    factory_fluid   : "air"
-    conv_poly       : [ 0.0, 1.0, 0.0, 0.0 ]
-    calib_poly      : [ -5.72846418e-03, 9.76581853e-01, 5.10523395e-04, -3.56041295e-06 ]
-    factory_unit    : "ln/h"
+    serial: "M000000000A"
+    bundle: "jet_h2"
+    user_fluid: "h2"
+    factory_fluid: "air"
+    conv_poly: [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly: [ -5.72846418e-03, 9.76581853e-01, 5.10523395e-04, -3.56041295e-06 ]
+    factory_unit: "ln/h"
     factory_capacity: 500.0
-    m3n_h_capacity  : 0.500
+    m3n_h_capacity: 0.500
     last_calibration: "2025-04-01"
 
   M000000000B:
@@ -112,14 +125,14 @@ devices:
     m3n_h_capacity: 0.750
     last_calibration: "2025-04-01"
 
-  M11205427A:
-    serial           : "M11205427A"
-    bundle           : "ch4"
-    user_fluid       : "ch4"
-    factory_fluid    : "o2"
-    conv_poly        : [ 0.0, 1.0, 0.0, 0.0 ]
-    calib_poly       : [ -2.40127934e-01, 9.77225823e-01, -4.31259937e-03, 5.33965270e-05 ]
-    factory_unit     : "mln/min"
-    factory_capacity : 1400.0
-    m3n_h_capacity   : 0.084
-    last_calibration : "2025-04-01"
+  M000000000C:
+    serial: "M000000000C"
+    bundle: "jet_h2"
+    user_fluid: "h2"
+    factory_fluid: "air"
+    conv_poly: [ 0.0, 1.0, 0.0, 0.0 ]
+    calib_poly: [ -5.72846418e-03, 9.76581853e-01, 5.10523395e-04, -3.56041295e-06 ]
+    factory_unit: "ln/h"
+    factory_capacity: 1000.0
+    m3n_h_capacity: 1.000
+    last_calibration: "2025-04-01"
