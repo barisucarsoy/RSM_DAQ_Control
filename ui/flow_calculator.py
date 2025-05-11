@@ -7,8 +7,7 @@ from textual.widget import Widget
 from textual.widgets import Button, Input, Label
 
 from device_managers.device_manager_bronkhorst import DeviceManager
-from ui.bronkhorst_widget import BronkhorstWidget
-
+from ui.bronkhorst_widget import BronkhorstWidget, MFCModule
 
 def calculate_flow_rate(
     temperature :float, # [degC]
@@ -200,9 +199,8 @@ class FlowCalculator(Widget):
         """Send log messages to the parent BronkhorstWidget"""
         # Find the parent BronkhorstWidget
         parent = self.app.query_one(BronkhorstWidget)
-        parent.log_message(f"[{message}]")
+        parent.log_message(f"{message}")
     
-    # Buttons
     @on(Button.Pressed, "#calculate_button")
     def calculate_button(self)  -> None:
         """Calculate the flow rates for both Jet and Pilot."""
@@ -267,8 +265,6 @@ class FlowCalculator(Widget):
                     f"Calculated Pilot: H2={flow_rates['H2_Pilot']:.5f} m3n/h, Air={flow_rates['Air_Pilot']:.5f} m3n/h"
             )
             
-
-            
         except ValueError as e:
             self.notify(
                     f"Invalid input: {e}",
@@ -291,7 +287,7 @@ class FlowCalculator(Widget):
         bundle_name : str
             One of the names listed in the configuration's ``mfc_bundles``.
         target_flow_m3n_h : float
-            Requested volumetric flow in m³ₙ/h (always normal-ised to this unit
+            Requested volumetric flow in m³ₙ/h (always normalized to this unit
             inside the YAML file).
 
         Returns
@@ -341,169 +337,39 @@ class FlowCalculator(Widget):
         pilot_h2_mfc  = self.choose_mfc("pilot_h2", self.calculated_flowrates["H2_Pilot"])
         pilot_air_mfc = self.choose_mfc("pilot_air", self.calculated_flowrates["Air_Pilot"])
         
-        self.log_message(
-                f"Selected MFCs: Jet H2={jet_h2_mfc}, Jet Air={jet_air_mfc}, "
-                f"             Pilot H2={pilot_h2_mfc}, Pilot Air={pilot_air_mfc}"
-        )
+        self.log_message(f"  Jet H2 = {jet_h2_mfc},   Jet Air = {jet_air_mfc}")
+        self.log_message(f"Pilot H2 = {pilot_h2_mfc}, Pilot Air = {pilot_air_mfc}")
         
-        
-    
-    # # --- Send Logic ---
-    # # Helper function to send flow rates to specific MFCs
-    # def _send_to_mfcs(
-    #         self, target_tag: str, h2_flow: float, air_flow: float, mfc_list: dict
-    # ) -> None:
-    #     if h2_flow <= 0 or air_flow <= 0:
-    #         self.notify(
-    #                 f"Please calculate valid {target_tag} flow rates first",
-    #                 severity="warning",
-    #                 title=f"Send {target_tag.capitalize()} MFCs",
-    #         )
-    #         return
-    #
-    #     # Find all MFC modules in the application (assuming this structure)
-    #     try:
-    #         # Ensure this import works within your application structure
-    #         from ui.bronkhorst_widget import MFCModule
-    #
-    #         mfc_modules = list(self.app.query(MFCModule))
-    #     except ImportError as ime:
-    #         self.notify(
-    #                 "Error: Could not import MFCModule. Sending disabled.", severity="error"
-    #         )
-    #         self.notify(str(ime), severity="error")
-    #         return
-    #     except Exception as e:
-    #         self.notify(f"Error finding MFC modules: {e}", severity="error")
-    #         return
-    #
-    #     # Keep track of how many values we've set
-    #     updates_applied = 0
-    #     low_flowrates = []
-    #
-    #     # Process H2 MFCs
-    #     for h2_serial in mfc_list.get("h2", []):
-    #         # Find the matching MFC module
-    #         self.notify(f"{str(mfc_list.get('h2', []))}", severity="information")
-    #
-    #         module_found = False
-    #         for module in mfc_modules:
-    #             if hasattr(module, "mfc_serial") and module.mfc_serial == h2_serial:
-    #                 module_found = True
-    #                 # Check capacity (using device_db if available)
-    #                 if h2_serial in self.device_db and hasattr(
-    #                         self.device_db[h2_serial], "target_capacity"
-    #                 ):
-    #                     if h2_flow < self.device_db[h2_serial].target_capacity * 0.1:
-    #                         low_flowrates.append(f"H2 ({h2_serial})")
-    #                 else:
-    #                     self.notify(
-    #                             f"Warning: Capacity info missing for H2 MFC {h2_serial}",
-    #                             severity="warning",
-    #                     )
-    #
-    #                 # Set the flow value in the input field
-    #                 try:
-    #                     input_field = module.query_one("#flow_input", Input)
-    #                     input_field.value = f"{h2_flow:.5f}"  # Format consistently
-    #                     updates_applied += 1
-    #                 except Exception as e:
-    #                     self.notify(
-    #                             f"Error setting H2 flow for {h2_serial}: {e}",
-    #                             severity="error",
-    #                     )
-    #                 break  # Found the module for this serial
-    #         if not module_found:
-    #             self.notify(
-    #                     f"Warning: H2 MFC module with serial {h2_serial} not found in UI.",
-    #                     severity="warning",
-    #             )
-    #
-    #     # Process Air MFCs
-    #     for air_serial in mfc_list.get("air", []):
-    #         # Find the matching MFC module
-    #         module_found = False
-    #         for module in mfc_modules:
-    #             if hasattr(module, "mfc_serial") and module.mfc_serial == air_serial:
-    #                 module_found = True
-    #                 # Check capacity (using device_db if available)
-    #                 if air_serial in self.device_db and hasattr(
-    #                         self.device_db[air_serial], "target_capacity"
-    #                 ):
-    #                     if air_flow < self.device_db[air_serial].target_capacity * 0.1:
-    #                         low_flowrates.append(f"Air ({air_serial})")
-    #                 else:
-    #                     self.notify(
-    #                             f"Warning: Capacity info missing for Air MFC {air_serial}",
-    #                             severity="warning",
-    #                     )
-    #
-    #                 # Set the flow value in the input field
-    #                 try:
-    #                     input_field = module.query_one("#flow_input", Input)
-    #                     input_field.value = f"{air_flow:.5f}"  # Format consistently
-    #                     updates_applied += 1
-    #                 except Exception as e:
-    #                     self.notify(
-    #                             f"Error setting Air flow for {air_serial}: {e}",
-    #                             severity="error",
-    #                     )
-    #                 break  # Found the module for this serial
-    #         if not module_found:
-    #             self.notify(
-    #                     f"Warning: Air MFC module with serial {air_serial} not found in UI.",
-    #                     severity="warning",
-    #             )
-    #
-    #     # Report results
-    #     if updates_applied > 0:
-    #         self.notify(
-    #                 f"Applied {target_tag} flow rates to {updates_applied} MFC input(s)",
-    #                 severity="information",
-    #                 title=f"Send {target_tag.capitalize()} MFCs",
-    #         )
-    #         # Warn about low flowrates if any were detected
-    #         if low_flowrates:
-    #             low_flowrate_msg = ", ".join(low_flowrates)
-    #             self.notify(
-    #                     f"Warning: Low flowrates (<10% capacity) for {target_tag}: {low_flowrate_msg}",
-    #                     severity="warning",
-    #                     title=f"Send {target_tag.capitalize()} MFCs",
-    #             )
-    #     else:
-    #         self.notify(
-    #                 f"No MFCs were updated for {target_tag}.",
-    #                 severity="warning",
-    #                 title=f"Send {target_tag.capitalize()} MFCs",
-    #         )
-    #
-    # @on(Button.Pressed, "#send_jet_button")
-    # def send_jet_flowrates(self):
-    #     """Send calculated jet flow rates to the corresponding MFCs."""
-    #     try:
-    #         self._send_to_mfcs(
-    #                 "jet", self.jet_flow_rate_h2, self.jet_flow_rate_air, self.jet_mfcs
-    #         )
-    #     except Exception as e:
-    #         self.notify(
-    #                 f"Error sending jet flow rates: {str(e)}",
-    #                 severity="error",
-    #                 title="Send Jet MFCs Error",
-    #         )
-    #
-    # @on(Button.Pressed, "#send_pilot_button")
-    # def send_pilot_flowrates(self):
-    #     """Send calculated pilot flow rates to the corresponding MFCs."""
-    #     try:
-    #         self._send_to_mfcs(
-    #                 "pilot",
-    #                 self.pilot_flow_rate_h2,
-    #                 self.pilot_flow_rate_air,
-    #                 self.pilot_mfcs,
-    #         )
-    #     except Exception as e:
-    #         self.notify(
-    #                 f"Error sending pilot flow rates: {str(e)}",
-    #                 severity="error",
-    #                 title="Send Pilot MFCs Error",
-    #         )
+        mfc_modules = list(self.app.query(MFCModule))
+        try:
+            for module in mfc_modules:
+                if hasattr(module, "mfc_serial"):
+                    if module.mfc_serial == jet_h2_mfc:
+                        input_field = module.query_one("#flow_input", Input)
+                        input_field.value = f"{self.calculated_flowrates["H2_Jet"]:.5f}"
+                        module.styles.background = "red 20%"
+                        module.styles.opacity = "100%"
+                        
+                    elif module.mfc_serial == jet_air_mfc:
+                        input_field = module.query_one("#flow_input", Input)
+                        input_field.value = f"{self.calculated_flowrates["Air_Jet"]:.5f}"
+                        module.styles.background = "blue 20%"
+                        module.styles.opacity = "100%"
+                        
+                    elif module.mfc_serial == pilot_h2_mfc:
+                        input_field = module.query_one("#flow_input", Input)
+                        input_field.value = f"{self.calculated_flowrates["H2_Pilot"]:.5f}"
+                        module.styles.background = "red 20%"
+                        module.styles.opacity = "100%"
+                        
+                    elif module.mfc_serial == pilot_air_mfc:
+                        input_field = module.query_one("#flow_input", Input)
+                        input_field.value = f"{self.calculated_flowrates["Air_Pilot"]:.5f}"
+                        module.styles.background = "blue 20%"
+                        module.styles.opacity = "100%"
+                    
+                    else:
+                        module.styles.opacity = "30%"
+                        module.styles.background = "black"
+        except Exception as e:
+            self.log_message(f"Error setting flow rates: {e}")

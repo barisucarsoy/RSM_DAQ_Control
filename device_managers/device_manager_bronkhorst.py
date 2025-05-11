@@ -295,9 +295,7 @@ class DeviceManager:
             print(f"Error aborting device: {e}")
 
     def soft_abort(self):
-        """Set all fuel mfc to 0 and purge with n2"""
-
-        self.purge()
+        """Set all fuel mfcs to 0"""
 
         for fuel in self.setup.fuels:
             for device_serial, device_config in self.device_db.items():

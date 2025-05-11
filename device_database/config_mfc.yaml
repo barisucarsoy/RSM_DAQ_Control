@@ -9,10 +9,9 @@ connection:
   baudrate: 38400                     # Baudrate for the serial connection
 
 setup: # Enter valid values for the gases
-  fuel        : ["h2"]
+  fuel        : ["h2", "ch4"]
   oxidizer    : ["air"]
   inert_gases : ["n2"]
-  misc        : ["ch4"]
 
 mfc_bundles: ["coflow", "pilot_air", "pilot_h2" , "jet_air", "jet_h2", "ch4"]
 

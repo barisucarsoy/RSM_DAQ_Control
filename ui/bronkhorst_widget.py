@@ -1,6 +1,6 @@
 import time
 
-from textual import on
+from textual import on, work
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, Vertical
 from textual.reactive import reactive
@@ -13,7 +13,6 @@ from ui.custom_progress_bar import ProgressBar as CustomProgressBar
 """
 Textual TUI widget for Bronkhorst flow meter control and monitoring.
 """
-
 
 class MFCModule(Widget):
 	CSS_PATH = "CSS_main.tcss"
@@ -38,6 +37,8 @@ class MFCModule(Widget):
 		self.mfc_fluid = self.mfc_data.user_fluid  # Target fluid of the MFC
 		self.mfc_unit = "m3n/h"  # Unit of the MFC
 		self.mfc_capacity = self.mfc_data.m3n_h_capacity  # Max capacity of the MFC
+		
+		self.is_input_percent = False  # Flag to check if input is in percent
 	
 	def log_message(self, message: str) -> None:
 		"""Send log messages to the parent BronkhorstWidget"""
@@ -112,19 +113,19 @@ class MFCModule(Widget):
 						id="flow_input",
 						tooltip="Set MFC flow rate",
 						classes="mfc_input disabled-input",
-						type="number",
+						type="text",
 						validate_on=["submitted"],
 				)
 				
-				yield Input(
-						placeholder="%",
-						id="percent_input",
-						tooltip="Set MFC flow percentage",
-						classes="mfc_input disabled-input",
-						type="number",
-						validate_on=["submitted"],
-				)
-				
+				# yield Input(
+				# 		placeholder="%",
+				# 		id="percent_input",
+				# 		tooltip="Set MFC flow percentage",
+				# 		classes="mfc_input disabled-input",
+				# 		type="number",
+				# 		validate_on=["submitted"],
+				# )
+				#
 				# Send button
 				yield Button(
 						"Send",
@@ -150,13 +151,13 @@ class MFCModule(Widget):
 				self.current_valve
 		)
 		
-		self.log_message(
-				"Pulled from database:"
-				+ " Max Capacity: "
-				+ str(self.mfc_capacity)
-				+ " "
-				+ self.mfc_unit
-		)
+		# self.log_message(
+		# 		"Pulled from database:"
+		# 		+ " Max Capacity: "
+		# 		+ str(self.mfc_capacity)
+		# 		+ " "
+		# 		+ self.mfc_unit
+		# )
 	
 	@on(Switch.Changed, "#mfc_arm_switch")
 	def handle_arm_switch(self, event: Switch.Changed) -> None:
@@ -188,45 +189,140 @@ class MFCModule(Widget):
 			self.log_message("Disarmed")
 			input_field.value = ""
 	
+	# ──────────────────────────────────────────────────────────────────────────────
+	# INPUT VALIDATION
+	# ──────────────────────────────────────────────────────────────────────────────
 	@on(Input.Changed, "#flow_input")
 	def validate_input(self, event: Input.Changed) -> None:
-		"""Validate and update percentage input"""
+		"""Validate user input, supporting both absolute flow-rate and % modes."""
+		self.is_input_percent = False
+		
+		# Make a local copy and trim whitespace at once
+		raw_value = event.value.strip()
+		
 		try:
-			value = float(event.value)
-			if value < 0 or value > self.mfc_capacity:
+			# ── Percentage mode ────────────────────────────────────────────────
+			if raw_value.startswith("%"):
+				self.is_input_percent = True
+				percent_str = raw_value.lstrip("%").strip()
+				
+				# Allow the user to type '%' and continue editing
+				if percent_str in ("", "."):
+					return
+				
+				percent_val = float(percent_str)
+				if not 0 <= percent_val <= 100:
+					self.log_message("Invalid percentage: must be 0–100 %.")
+					event.input.value = "%"
+					return
+				
+				# Update progress-bar directly with percentage
+				self.set_percentage = f"{percent_val:.2f}"
+				self.query_one("#set_percent_bar", CustomProgressBar).progress = percent_val
+				return  # Nothing more to do in % mode
+			
+			# ── Absolute flow-rate mode ────────────────────────────────────────
+			if raw_value in ("", "."):
+				return  # User is still typing
+			
+			flow_val = float(raw_value)
+			if not 0 <= flow_val <= self.mfc_capacity:
 				self.log_message(
-						f"Invalid value: {value}. Must be between 0 and {self.mfc_capacity}."
+						f"Invalid value: {flow_val}. Must be between 0 and {self.mfc_capacity}."
 				)
 				event.input.value = ""
+				return
 			
-			percentage = value / self.mfc_capacity * 100.00
-			# Update the set percentage bar to reflect input value
-			self.set_percentage = str(percentage)
-			self.query_one("#set_percent_bar", CustomProgressBar).progress = float(
-					self.set_percentage
-			)
+			percentage = (flow_val / self.mfc_capacity) * 100.0
+			self.set_percentage = f"{percentage:.2f}"
+			self.query_one("#set_percent_bar", CustomProgressBar).progress = percentage
 		
 		except ValueError:
-			# If not a valid number, reset to 0
+			# Not a valid number → clear the field
 			event.input.value = ""
 	
+	# ──────────────────────────────────────────────────────────────────────────────
+	# SEND BUTTON HANDLER
+	# ──────────────────────────────────────────────────────────────────────────────
 	@on(Button.Pressed, "#send_button")
 	def send_flowrate(self) -> None:
-		"""Send the percentage to the device"""
+		"""Send the user-entered set-point to the device."""
 		if not self.armed:
 			self.notify("MFC is not armed.", severity="warning")
 			return
 		
-		try:
-			# Get the percentage from the input field
-			input_field = self.query_one("#flow_input", Input)
-			
-			flowrate = float(input_field.value)
-			
-			self.manager.write_setpoint_manual(self.mfc_serial, flowrate)
+		input_field = self.query_one("#flow_input", Input)
+		raw_value = input_field.value.strip()
 		
+		try:
+			# Decide which mode we are in
+			if self.is_input_percent or raw_value.startswith("%"):
+				percent_val = float(raw_value.lstrip("%").strip())
+				self.manager.write_setpoint_manual(
+						self.mfc_serial, percent_val, is_percentage=True
+				)
+			else:
+				flow_val = float(raw_value)
+				self.manager.write_setpoint_manual(
+						self.mfc_serial, flow_val, is_percentage=False
+				)
+		
+		except ValueError:
+			self.notify("Invalid input – please enter a number or %value.", severity="warning")
 		except Exception as e:
 			self.log_message(f"Error sending flow rate: {e}")
+	
+	# @on(Input.Changed, "#flow_input")
+	# def validate_input(self, event: Input.Changed) -> None:
+	# 	"""Validate and update percentage input"""
+	# 	self.is_input_percent = False
+	# 	try:
+	# 		value = event.value
+	#
+	# 		# Check if the value starts with % character
+	# 		if value.startswith("%"):
+	# 			self.is_input_percent = True
+	#
+	# 			# implement seperate logic
+	#
+	# 		else:
+	# 			is_value_percent = False
+	#
+	# 		value = float(value)
+	# 		if value < 0 or value > self.mfc_capacity:
+	# 			self.log_message(
+	# 					f"Invalid value: {value}. Must be between 0 and {self.mfc_capacity}."
+	# 			)
+	# 			event.input.value = ""
+	#
+	# 		percentage = value / self.mfc_capacity * 100.00
+	# 		# Update the set percentage bar to reflect input value
+	# 		self.set_percentage = str(percentage)
+	# 		self.query_one("#set_percent_bar", CustomProgressBar).progress = float(
+	# 				self.set_percentage
+	# 		)
+	#
+	# 	except ValueError:
+	# 		# If not a valid number, reset to 0
+	# 		event.input.value = ""
+	#
+	# @on(Button.Pressed, "#send_button")
+	# def send_flowrate(self) -> None:
+	# 	"""Send the percentage to the device"""
+	# 	if not self.armed:
+	# 		self.notify("MFC is not armed.", severity="warning")
+	# 		return
+	#
+	# 	try:
+	# 		# Get the percentage from the input field
+	# 		input_field = self.query_one("#flow_input", Input)
+	#
+	# 		flowrate = float(input_field.value)
+	#
+	# 		self.manager.write_setpoint_manual(self.mfc_serial, flowrate)
+	#
+	# 	except Exception as e:
+	# 		self.log_message(f"Error sending flow rate: {e}")
 	
 	@on(Button.Pressed, "#wink_button")
 	def blink(self) -> None:
@@ -271,12 +367,6 @@ class BronkhorstWidget(Widget):
 		self.device_db = self.manager.device_db  # Access the device database
 	
 	def compose(self) -> ComposeResult:
-		# Dashboard controls container
-		# with Horizontal(id="dash_container"):
-		#     yield Button("Connect", id="connect_button", variant="success", classes="comm_button")
-		#     yield Button("Abort", id="abort_button", variant="error", classes="comm_button")
-		#     yield Label("Polling status: NaN", id="connection_status", classes="polling_status")
-		
 		# MFC modules container
 		mfc_box = Container(id="MFC_BOX")
 		mfc_box.border_title = ""
@@ -291,7 +381,6 @@ class BronkhorstWidget(Widget):
 	
 	# TODO: Implement connection monitoring
 	# TODO: Implement polling indicator
-	# TODO: Implement connection status for individual devices
 	# TODO: Add disconnection handling
 	# TODO: Add abort button functionality
 	
@@ -364,9 +453,10 @@ class BronkhorstWidget(Widget):
 		except Exception as e:
 			self.log_message(f"Error getting measurement_package_updates: {e}")
 	
+	@work(exclusive=True, thread=True)  # Apply the @work decorator here
 	def update_all_mfc_measurements(self) -> None:
 		"""Update all MFC modules with the latest measurement data"""
-		# First read all parameters from all devices in one batch
+		# First, read all parameters from all devices in one batch
 		success = self.manager.read_multiple_parameters()
 		
 		if success:

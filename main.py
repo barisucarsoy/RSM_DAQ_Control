@@ -1,11 +1,7 @@
-# from multiprocessing import process
-
 from device_managers.device_manager_bronkhorst import DeviceManager
 from ui.main_app import RSM_DAQ_Toolbox
 
 if __name__ == "__main__":
-
-    # main process core
 
     # Initialize the device manager
     device_manager = DeviceManager.get_instance()
@@ -21,5 +17,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"Error stopping device manager: {e}")
-
-# Todo: implement multiprocessing

@@ -25,7 +25,6 @@ class SetupConfig:
     fuels: List[str]
     oxidizers: List[str]
     inert_gases: List[str]
-    misc: List[str]
 
 @dataclass
 class DeviceConfig:
@@ -88,11 +87,10 @@ def load_config(config_path: str = "config_mfc.yaml") -> BronkhorstConfig:
             fuels=config_data['setup']['fuel'],
             oxidizers=config_data['setup']['oxidizer'],
             inert_gases=config_data['setup']['inert_gases'],
-            misc=config_data['setup']['misc']
     )
 
     # Combine all valid fluids from setup
-    valid_fluids = setup_config.fuels + setup_config.oxidizers + setup_config.inert_gases + setup_config.misc
+    valid_fluids = setup_config.fuels + setup_config.oxidizers + setup_config.inert_gases
 
     # Convert MFC bundle list to a dictionary where bundle names are keys and values are empty lists
     # This will be populated with device serials later
