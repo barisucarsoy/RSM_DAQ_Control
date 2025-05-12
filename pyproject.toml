@@ -1,0 +1,15 @@
+[project]
+name = "rsm-daq-control"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bronkhorst-propar>=1.2.0",
+    "cantera>=3.1.0",
+    "numpy>=2.2.5",
+    "plotly>=6.0.1",
+    "pyyaml>=6.0.2",
+    "textual>=3.2.0",
+    "textual-dev>=1.7.0",
+]
