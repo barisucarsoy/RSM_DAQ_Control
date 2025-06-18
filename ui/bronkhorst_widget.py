@@ -350,7 +350,7 @@ class MFCModule(Widget):
 				self.query_one("#valve_percent_bar", CustomProgressBar).progress = (
 						self.current_valve
 				)
-				self.query_one("#temperature_label", Label).update(self.temperature)
+				# self.query_one("#temperature_label", Label).update(self.temperature)
 				self.query_one("#flow_label", Label).update(self.flowrate)
 		
 		except Exception as e:
