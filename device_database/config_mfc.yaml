@@ -20,8 +20,8 @@ mfc_bundles: ["coflow", "pilot_air", "pilot_h2" , "jet_air", "jet_h2", "ch4"]
   #  bundle:            "coflow"      -> User defined nametag for the device for bundling
   #  user_fluid:        "n2"          -> Fluid that the used in the application
   #  factory_fluid:     "air"         -> Fluid that the device is factory calibrated with
-  #  conv_poly:         [0, 1, 0, 0]  -> Conversion polynomial coefficients a+b*x^2+cx^3
-  #  calib_poly:        [0, 1, 0, 0]  -> Calibration polynomial coefficients a+b*x^2+cx^3
+  #  conv_poly:         [0, 1, 0, 0]  -> Conversion polynomial coefficients a + bx + cx^2 + dx^3
+  #  calib_poly:        [0, 1, 0, 0]  -> Calibration polynomial coefficients a + bx + cx^2 + dx^3
   #  factory_unit:      "m3n/h"       -> Unit of the factory calibration
   #  factory_capacity:  100.0         -> Factory capacity of the device
   #  m3n_h_capacity:    100.0         -> Capacity of the device in m3n/h
